@@ -68,10 +68,15 @@ func sprint():
 	if IS_SPRINTING:
 		speed = SPRINT_SPEED
 
-# to do : is sprinting = slide, !is_on_floor : ground pound
+# to do : is sprinting = slide, !is_on_floor : ground pound https://www.youtube.com/watch?v=dublNJgr13M
 func crouch(delta):
 	if Input.is_action_just_pressed("crouch") and is_on_floor() and not IS_SPRINTING:
 		IS_CROUCHING = not IS_CROUCHING
+		
+	if Input.is_action_just_pressed("crouch") and is_on_floor() and IS_SPRINTING:
+		IS_CROUCHING = not IS_CROUCHING
+		IS_SPRINTING = not IS_SPRINTING
+		
 		
 	if IS_CROUCHING:
 		speed = CROUCHING_SPEED
