@@ -6,9 +6,13 @@ var speed
 const WALK_SPEED = 5.0
 const SPRINT_SPEED = 10.0
 const CROUCHING_SPEED = 2.5
+const SLIDE_SPEED = 15.0
 
 var IS_SPRINTING = false
 var IS_CROUCHING = false
+var IS_SLIDING = false
+var slide_timer = 0.0
+const SLIDE_DURATION = 0.3
 
 # player height
 const DEFAULT_HEIGHT = 1.5
@@ -40,6 +44,8 @@ var gravity = 9.8
 @onready var head = $Head
 @onready var camera = $Head/Camera3D
 @onready var player_collision = $CollisionShape3D
+@onready var anim = $Head/AnimationPlayer
+@onready var particle = $Head/AnimationPlayer/GPUParticles3D
 
 @onready var head_position = head.position
 
@@ -59,25 +65,31 @@ func jump():
 		velocity.y = JUMP_VELOCITY
 
 
-# to do : passer sprint en "hold" avec une jauge
 func sprint():
 	if Input.is_action_just_pressed("sprint") and is_on_floor():
 		IS_SPRINTING = not IS_SPRINTING
 		IS_CROUCHING = false
-	
+
 	if IS_SPRINTING:
 		speed = SPRINT_SPEED
 
-# to do : is sprinting = slide, !is_on_floor : ground pound https://www.youtube.com/watch?v=dublNJgr13M
+
 func crouch(delta):
-	if Input.is_action_just_pressed("crouch") and is_on_floor() and not IS_SPRINTING:
-		IS_CROUCHING = not IS_CROUCHING
-		
-	if Input.is_action_just_pressed("crouch") and is_on_floor() and IS_SPRINTING:
-		IS_CROUCHING = not IS_CROUCHING
-		IS_SPRINTING = not IS_SPRINTING
-		
-		
+	if Input.is_action_just_pressed("crouch") and is_on_floor():
+		if IS_SPRINTING:
+			IS_CROUCHING = not IS_CROUCHING
+			IS_SLIDING = IS_CROUCHING
+			slide_timer = SLIDE_DURATION
+			anim.play("sliding")
+			particle.emitting = true
+			particle.restart()
+			
+		else:
+			IS_CROUCHING = not IS_CROUCHING
+			IS_SLIDING = false
+			anim.play("RESET")
+			particle.emitting = false
+
 	if IS_CROUCHING:
 		speed = CROUCHING_SPEED
 		JUMP_VELOCITY = JUMP_VELOCITY_CROUCH
@@ -90,13 +102,14 @@ func crouch(delta):
 
 func _headbob(time) -> Vector3:
 	var pos = Vector3.ZERO
-	pos.y = sin(time * BOB_FREQ) * BOB_AMP /2
-	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP /2
+	pos.y = sin(time * BOB_FREQ) * BOB_AMP / 2
+	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP / 2
 	return pos
 
 
 func _physics_process(delta):
 
+	particle.emitting = false
 	speed = WALK_SPEED
 	JUMP_VELOCITY = JUMP_VELOCITY_WALK
 
@@ -107,10 +120,18 @@ func _physics_process(delta):
 	sprint()
 	crouch(delta)
 	jump()
-	
+
+	if IS_SLIDING:
+		speed = SLIDE_SPEED
+		slide_timer -= delta
+		if slide_timer <= 0:
+			IS_SLIDING = false
+			speed = CROUCHING_SPEED
+			anim.play("RESET")
+
 	var input_dir = Input.get_vector("left", "right", "up", "down")
 	var direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	
+
 	if is_on_floor():
 		if direction:
 			velocity.x = direction.x * speed
@@ -121,14 +142,14 @@ func _physics_process(delta):
 	else:
 		velocity.x = lerp(velocity.x, direction.x * speed, delta * 3.0)
 		velocity.z = lerp(velocity.z, direction.z * speed, delta * 3.0)
-		
+
 	# Head bob
 	t_bob += delta * velocity.length() * float(is_on_floor())
 	camera.transform.origin = _headbob(t_bob)
-	
+
 	# FOV
 	var velocity_clamped = clamp(velocity.length(), 0.5, SPRINT_SPEED * 2)
 	var target_fov = BASE_FOV + FOV_CHANGE * velocity_clamped
 	camera.fov = lerp(camera.fov, target_fov, delta * 8.0)
-	
+
 	move_and_slide()
