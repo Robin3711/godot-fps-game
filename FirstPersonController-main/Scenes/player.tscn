@@ -83,7 +83,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("AnimationPlayer/GPUParticles3D:visible")
+tracks/3/path = NodePath("GPUParticles3D:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -135,8 +135,8 @@ libraries = {
 "": SubResource("AnimationLibrary_r3xsg")
 }
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="Head/AnimationPlayer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05547, -7.37332)
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.62353, -7.37332)
 amount = 20
 process_material = SubResource("ParticleProcessMaterial_2jfqd")
 draw_pass_1 = SubResource("BoxMesh_834ge")

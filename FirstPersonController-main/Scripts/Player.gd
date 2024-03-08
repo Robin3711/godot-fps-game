@@ -1,5 +1,8 @@
 extends CharacterBody3D
 
+#to do : slide only forward ( and not previous direction )
+# duration based sprint
+
 var speed
 
 # speed consts
@@ -12,7 +15,10 @@ var IS_SPRINTING = false
 var IS_CROUCHING = false
 var IS_SLIDING = false
 var slide_timer = 0.0
-const SLIDE_DURATION = 0.3
+const SLIDE_DURATION = 0.5
+
+var sprint_stamina = 10.0
+const SPRINT_MAX_STAMINA = 10.0
 
 # player height
 const DEFAULT_HEIGHT = 1.5
@@ -26,6 +32,7 @@ var JUMP_VELOCITY
 const JUMP_VELOCITY_WALK = 4.8
 const JUMP_VELOCITY_SPRINT = 6.8
 const JUMP_VELOCITY_CROUCH = 2.8
+const JUMP_VELOCITY_SLIDE = 8.8
 
 const SENSITIVITY = 0.004
 
@@ -38,6 +45,9 @@ var t_bob = 0.0
 const BASE_FOV = 75.0
 const FOV_CHANGE = 1.5
 
+var input_dir = Vector3.ZERO
+var direction = Vector3.ZERO
+
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = 9.8
 
@@ -45,12 +55,13 @@ var gravity = 9.8
 @onready var camera = $Head/Camera3D
 @onready var player_collision = $CollisionShape3D
 @onready var anim = $Head/AnimationPlayer
-@onready var particle = $Head/AnimationPlayer/GPUParticles3D
+@onready var particle = $Head/GPUParticles3D
 
 @onready var head_position = head.position
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	particle.emitting = false
 
 
 func _unhandled_input(event):
@@ -65,35 +76,52 @@ func jump():
 		velocity.y = JUMP_VELOCITY
 
 
-func sprint():
+func sprint(delta):
 	if Input.is_action_just_pressed("sprint") and is_on_floor():
 		IS_SPRINTING = not IS_SPRINTING
 		IS_CROUCHING = false
 
 	if IS_SPRINTING:
 		speed = SPRINT_SPEED
+		JUMP_VELOCITY = JUMP_VELOCITY_SPRINT
+		sprint_stamina -= delta
+		if sprint_stamina <= 0 and is_on_floor():
+			IS_SPRINTING = false
+	elif is_on_floor():
+		sprint_stamina += delta*0.5
+	
+	clamp(sprint_stamina,0.0,SPRINT_MAX_STAMINA)
 
 
 func crouch(delta):
 	if Input.is_action_just_pressed("crouch") and is_on_floor():
 		if IS_SPRINTING:
-			IS_CROUCHING = not IS_CROUCHING
-			IS_SLIDING = IS_CROUCHING
+			IS_CROUCHING = false
+			IS_SLIDING = true
 			slide_timer = SLIDE_DURATION
 			anim.play("sliding")
 			particle.emitting = true
-			particle.restart()
-			
 		else:
-			IS_CROUCHING = not IS_CROUCHING
 			IS_SLIDING = false
+			IS_CROUCHING = not IS_CROUCHING
+		IS_SPRINTING = false
+
+	if IS_SLIDING:
+		speed = SLIDE_SPEED
+		JUMP_VELOCITY = JUMP_VELOCITY_SLIDE
+		slide_timer -= delta
+		if slide_timer <= 0 and is_on_floor():
+			IS_SLIDING = false
+			IS_CROUCHING = true
 			anim.play("RESET")
 			particle.emitting = false
 
-	if IS_CROUCHING:
+	elif IS_CROUCHING:
 		speed = CROUCHING_SPEED
 		JUMP_VELOCITY = JUMP_VELOCITY_CROUCH
 		player_collision.shape.height -= CROUCH_TRANSITION_SPEED * delta
+		JUMP_VELOCITY = JUMP_VELOCITY_CROUCH
+
 	else:
 		player_collision.shape.height += CROUCH_TRANSITION_SPEED * delta
 
@@ -109,7 +137,6 @@ func _headbob(time) -> Vector3:
 
 func _physics_process(delta):
 
-	particle.emitting = false
 	speed = WALK_SPEED
 	JUMP_VELOCITY = JUMP_VELOCITY_WALK
 
@@ -117,20 +144,17 @@ func _physics_process(delta):
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
-	sprint()
+	sprint(delta)
 	crouch(delta)
 	jump()
+	
+	
+	
+	if not IS_SLIDING:
+	
+		input_dir = Input.get_vector("left", "right", "up", "down")
+		direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
-	if IS_SLIDING:
-		speed = SLIDE_SPEED
-		slide_timer -= delta
-		if slide_timer <= 0:
-			IS_SLIDING = false
-			speed = CROUCHING_SPEED
-			anim.play("RESET")
-
-	var input_dir = Input.get_vector("left", "right", "up", "down")
-	var direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
 	if is_on_floor():
 		if direction:
