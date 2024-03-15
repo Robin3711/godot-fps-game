@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://b1nbfoi44075y"]
+[gd_scene load_steps=10 format=3 uid="uid://b1nbfoi44075y"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_rlwos"]
+[ext_resource type="Texture2D" uid="uid://bg4lxahlxuxq8" path="res://crosshaire.png" id="2_j4kur"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xc2g5"]
 
@@ -129,6 +130,22 @@ shape = SubResource("CapsuleShape3D_wydro")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.679, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head"]
+
+[node name="TextureRect" type="TextureRect" parent="Head/Camera3D"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_j4kur")
+expand_mode = 1
+stretch_mode = 3
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Head"]
 libraries = {

@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://db2h3t17k37pe"]
+[gd_scene load_steps=10 format=3 uid="uid://db2h3t17k37pe"]
 
 [ext_resource type="Material" uid="uid://b4s0xnt1f6lia" path="res://Materials/Green.tres" id="1_o5nrg"]
 [ext_resource type="Material" uid="uid://bi1h4xe7msjwi" path="res://Materials/Pink.tres" id="3_irgfk"]
 [ext_resource type="Material" uid="uid://b122sws3pt7w7" path="res://Materials/Red.tres" id="4_nuwel"]
 [ext_resource type="PackedScene" uid="uid://b1nbfoi44075y" path="res://Scenes/player.tscn" id="5_48wf7"]
 [ext_resource type="Material" uid="uid://p2nkjd3ge3qm" path="res://Materials/Blue.tres" id="5_te4rd"]
+[ext_resource type="PackedScene" uid="uid://sfke66oh3wvr" path="res://hud.tscn" id="6_tipcx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_5lq0h"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -90,3 +91,7 @@ transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -
 shadow_enabled = true
 
 [node name="Player" parent="." instance=ExtResource("5_48wf7")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="CanvasLayer" instance=ExtResource("6_tipcx")]

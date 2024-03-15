@@ -1,7 +1,7 @@
 extends CharacterBody3D
 
-#to do : slide only forward ( and not previous direction )
-# duration based sprint
+
+signal stamina_changed
 
 var speed
 
@@ -91,6 +91,8 @@ func sprint(delta):
 		sprint_stamina += delta*0.5
 	
 	clamp(sprint_stamina,0.0,SPRINT_MAX_STAMINA)
+	stamina_changed.emit(sprint_stamina)
+	emit_signal("stamina_changed",sprint_stamina)
 
 
 func crouch(delta):
