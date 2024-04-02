@@ -1,3 +1,9 @@
-godot first person shooter prototype.
+### FPS en GDscript
 
-i will update this read me as i work on the project
+##### Description
+
+TO DO
+
+##### Installation
+
+TO DO
