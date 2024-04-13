@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://sfke66oh3wvr"]
+[gd_scene load_steps=2 format=3 uid="uid://sfke66oh3wvr"]
+
+[ext_resource type="Script" path="res://hud.gd" id="1_thsly"]
 
 [node name="hud" type="Control"]
 layout_mode = 3
@@ -7,13 +9,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_thsly")
 
-[node name="Panel" type="Panel" parent="."]
-layout_mode = 1
-offset_right = 153.0
-offset_bottom = 24.0
-
-[node name="TextureProgressBar" type="TextureProgressBar" parent="Panel"]
+[node name="ProgressBar" type="ProgressBar" parent="."]
 layout_mode = 0
-offset_right = 153.0
-offset_bottom = 24.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 402.0
+offset_bottom = 60.0
+show_percentage = false

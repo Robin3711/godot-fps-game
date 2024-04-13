@@ -56,12 +56,15 @@ var gravity = 9.8
 @onready var player_collision = $CollisionShape3D
 @onready var anim = $Head/AnimationPlayer
 @onready var particle = $Head/GPUParticles3D
+@onready var canvas = $Head/Camera3D/CanvasLayer
+@onready var test = $Head/Camera3D/CanvasLayer/hud
 
 @onready var head_position = head.position
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	particle.emitting = false
+	
 
 
 func _unhandled_input(event):
@@ -90,8 +93,9 @@ func sprint(delta):
 	elif is_on_floor():
 		sprint_stamina += delta*0.5
 	
-	clamp(sprint_stamina,0.0,SPRINT_MAX_STAMINA)
-	stamina_changed.emit(sprint_stamina)
+	sprint_stamina = clamp(sprint_stamina,0.0,SPRINT_MAX_STAMINA)
+	
+	#print("stamina_changed :",round(sprint_stamina))
 	emit_signal("stamina_changed",sprint_stamina)
 
 
@@ -179,3 +183,4 @@ func _physics_process(delta):
 	camera.fov = lerp(camera.fov, target_fov, delta * 8.0)
 
 	move_and_slide()
+#
