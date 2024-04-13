@@ -68,7 +68,7 @@ func _ready():
 
 
 func _unhandled_input(event):
-	if event is InputEventMouseMotion:
+	if event is InputEventMouseMotion and !IS_SLIDING:
 		head.rotate_y(-event.relative.x * SENSITIVITY)
 		camera.rotate_x(-event.relative.y * SENSITIVITY)
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-40), deg_to_rad(60))
@@ -90,7 +90,7 @@ func sprint(delta):
 		sprint_stamina -= delta
 		if sprint_stamina <= 0 and is_on_floor():
 			IS_SPRINTING = false
-	elif is_on_floor():
+	elif is_on_floor() and !IS_SLIDING: # to do : better stamina calcul
 		sprint_stamina += delta*0.5
 	
 	sprint_stamina = clamp(sprint_stamina,0.0,SPRINT_MAX_STAMINA)
@@ -107,6 +107,7 @@ func crouch(delta):
 			slide_timer = SLIDE_DURATION
 			anim.play("sliding")
 			particle.emitting = true
+			
 		else:
 			IS_SLIDING = false
 			IS_CROUCHING = not IS_CROUCHING
@@ -116,6 +117,7 @@ func crouch(delta):
 		speed = SLIDE_SPEED
 		JUMP_VELOCITY = JUMP_VELOCITY_SLIDE
 		slide_timer -= delta
+		sprint_stamina -= delta # added stamina use when sliding
 		if slide_timer <= 0 and is_on_floor():
 			IS_SLIDING = false
 			IS_CROUCHING = true
@@ -156,23 +158,28 @@ func _physics_process(delta):
 	
 	
 	
-	if not IS_SLIDING:
-	
+	if not IS_SLIDING and not IS_SPRINTING:
+
 		input_dir = Input.get_vector("left", "right", "up", "down")
 		direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
 
-	if is_on_floor():
-		if direction:
-			velocity.x = direction.x * speed
-			velocity.z = direction.z * speed
+		if is_on_floor():
+			if direction:
+				velocity.x = direction.x * speed
+				velocity.z = direction.z * speed
+			else:
+				velocity.x = lerp(velocity.x, direction.x * speed, delta * 7.0)
+				velocity.z = lerp(velocity.z, direction.z * speed, delta * 7.0)
 		else:
-			velocity.x = lerp(velocity.x, direction.x * speed, delta * 7.0)
-			velocity.z = lerp(velocity.z, direction.z * speed, delta * 7.0)
+			velocity.x = lerp(velocity.x, direction.x * speed, delta * 3.0)
+			velocity.z = lerp(velocity.z, direction.z * speed, delta * 3.0)
 	else:
-		velocity.x = lerp(velocity.x, direction.x * speed, delta * 3.0)
-		velocity.z = lerp(velocity.z, direction.z * speed, delta * 3.0)
-
+		direction = camera.global_transform.basis.z.normalized()
+		velocity.x = -direction.x * SPRINT_SPEED
+		velocity.z = -direction.z * SPRINT_SPEED
+	
+	
 	# Head bob
 	t_bob += delta * velocity.length() * float(is_on_floor())
 	camera.transform.origin = _headbob(t_bob)
