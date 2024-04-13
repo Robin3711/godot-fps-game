@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-
+#signals
 signal stamina_changed
 
 var speed
@@ -11,12 +11,16 @@ const SPRINT_SPEED = 10.0
 const CROUCHING_SPEED = 2.5
 const SLIDE_SPEED = 15.0
 
+# actions bools
 var IS_SPRINTING = false
 var IS_CROUCHING = false
 var IS_SLIDING = false
+
+#slide time
 var slide_timer = 0.0
 const SLIDE_DURATION = 0.5
 
+# stamina
 var sprint_stamina = 10.0
 const SPRINT_MAX_STAMINA = 10.0
 
@@ -27,6 +31,7 @@ const CROUCH_HEIGHT = 0.5
 # speed of the transition between walking and crouching
 const CROUCH_TRANSITION_SPEED = 15
 
+#jump velocity
 var JUMP_VELOCITY
 
 const JUMP_VELOCITY_WALK = 4.8
@@ -48,9 +53,10 @@ const FOV_CHANGE = 1.5
 var input_dir = Vector3.ZERO
 var direction = Vector3.ZERO
 
-# Get the gravity from the project settings to be synced with RigidBody nodes.
+# Gravity
 var gravity = 9.8
 
+#nodes
 @onready var head = $Head
 @onready var camera = $Head/Camera3D
 @onready var player_collision = $CollisionShape3D
@@ -61,12 +67,13 @@ var gravity = 9.8
 
 @onready var head_position = head.position
 
+
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	particle.emitting = false
-	
 
 
+# camera 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion and !IS_SLIDING:
 		head.rotate_y(-event.relative.x * SENSITIVITY)
@@ -74,10 +81,10 @@ func _unhandled_input(event):
 		camera.rotation.x = clamp(camera.rotation.x, deg_to_rad(-40), deg_to_rad(60))
 
 
+#actions functions
 func jump():
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-
 
 func sprint(delta):
 	if Input.is_action_just_pressed("sprint") and is_on_floor():
@@ -98,8 +105,8 @@ func sprint(delta):
 	#print("stamina_changed :",round(sprint_stamina))
 	emit_signal("stamina_changed",sprint_stamina)
 
-
 func crouch(delta):
+	# "it just work"
 	if Input.is_action_just_pressed("crouch") and is_on_floor():
 		if IS_SPRINTING:
 			IS_CROUCHING = false
@@ -156,13 +163,11 @@ func _physics_process(delta):
 	crouch(delta)
 	jump()
 	
-	
-	
+	#huge mess ahead
 	if not IS_SLIDING and not IS_SPRINTING:
 
 		input_dir = Input.get_vector("left", "right", "up", "down")
 		direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-
 
 		if is_on_floor():
 			if direction:
@@ -178,7 +183,6 @@ func _physics_process(delta):
 		direction = camera.global_transform.basis.z.normalized()
 		velocity.x = -direction.x * SPRINT_SPEED
 		velocity.z = -direction.z * SPRINT_SPEED
-	
 	
 	# Head bob
 	t_bob += delta * velocity.length() * float(is_on_floor())
