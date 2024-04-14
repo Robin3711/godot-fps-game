@@ -1,0 +1,63 @@
+[gd_scene load_steps=6 format=3 uid="uid://c73nq0u4vhiuk"]
+
+[ext_resource type="Script" path="res://gun.gd" id="1_3jch2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ind88"]
+
+[sub_resource type="Animation" id="Animation_0aiqy"]
+resource_name = "shooting"
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array()
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("MeshInstance3D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.0128718, 0, 0), Vector3(0.5, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_n41l5"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.0128718, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wswuf"]
+_data = {
+"RESET": SubResource("Animation_n41l5"),
+"shooting": SubResource("Animation_0aiqy")
+}
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_3jch2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.0128718, 0, 0)
+mesh = SubResource("BoxMesh_ind88")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_wswuf")
+}
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -0.0239545, 0, 0)

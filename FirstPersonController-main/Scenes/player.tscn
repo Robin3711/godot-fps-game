@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://b1nbfoi44075y"]
+[gd_scene load_steps=12 format=3 uid="uid://b1nbfoi44075y"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_rlwos"]
 [ext_resource type="Texture2D" uid="uid://bg4lxahlxuxq8" path="res://crosshaire.png" id="2_j4kur"]
-[ext_resource type="PackedScene" uid="uid://sfke66oh3wvr" path="res://hud.tscn" id="3_k57ld"]
+[ext_resource type="PackedScene" uid="uid://sfke66oh3wvr" path="res://Scenes/hud.tscn" id="3_k57ld"]
+[ext_resource type="PackedScene" uid="uid://c73nq0u4vhiuk" path="res://gun.tscn" id="4_1etax"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xc2g5"]
 
@@ -154,6 +155,9 @@ stretch_mode = 3
 [node name="hud" parent="Head/Camera3D/CanvasLayer" instance=ExtResource("3_k57ld")]
 mouse_force_pass_scroll_events = false
 
+[node name="Node3D" parent="Head/Camera3D" instance=ExtResource("4_1etax")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, -0.481653, -1)
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Head"]
 libraries = {
 "": SubResource("AnimationLibrary_r3xsg")
@@ -161,6 +165,7 @@ libraries = {
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.62353, -7.37332)
+visible = false
 amount = 20
 process_material = SubResource("ParticleProcessMaterial_2jfqd")
 draw_pass_1 = SubResource("BoxMesh_834ge")

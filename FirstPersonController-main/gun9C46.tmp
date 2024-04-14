@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://c73nq0u4vhiuk"]
+
+[ext_resource type="Script" path="res://gun.gd" id="1_3jch2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ind88"]
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_3jch2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0, 0, 0)
+mesh = SubResource("BoxMesh_ind88")

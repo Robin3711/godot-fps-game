@@ -113,7 +113,7 @@ func crouch(delta):
 			IS_SLIDING = true
 			slide_timer = SLIDE_DURATION
 			anim.play("sliding")
-			particle.emitting = true
+			particle.emitting = true	
 			
 		else:
 			IS_SLIDING = false
@@ -145,8 +145,8 @@ func crouch(delta):
 
 func _headbob(time) -> Vector3:
 	var pos = Vector3.ZERO
-	pos.y = sin(time * BOB_FREQ) * BOB_AMP / 2
-	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP / 2
+	pos.y = sin(time * BOB_FREQ) * BOB_AMP
+	pos.x = cos(time * BOB_FREQ / 2) * BOB_AMP 
 	return pos
 
 

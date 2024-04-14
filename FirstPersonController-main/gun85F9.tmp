@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://c73nq0u4vhiuk"]
+
+[sub_resource type="GDScript" id="GDScript_kwe01"]
+script/source = "extends Node3D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	if Input.is_action_just_pressed(\"shoot\"):
+		print(\"shooting\")
+"
+
+[sub_resource type="BoxMesh" id="BoxMesh_ind88"]
+
+[node name="Node3D" type="Node3D"]
+script = SubResource("GDScript_kwe01")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 0.0128718, 0, 0)
+mesh = SubResource("BoxMesh_ind88")
